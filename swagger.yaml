@@ -102,7 +102,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /accounts/{accountId}/transaction:
+  /accounts/{accountId}/transactions:
     get:
       security:
         - Bearer: []
@@ -313,7 +313,10 @@ definitions:
           note:
             type: string
     example:
-      - id: 3751
+      status: 200
+      message: "See one transactions"
+      transaction:
+        id: 3751
         date: 2023-11-27T09:11:11Z
         description: ""
         amount: 55.79
@@ -327,7 +330,7 @@ definitions:
     type: object
     properties:
       id:
-        type: string
+        type: integer
       date:
         type: string
         format: date-time
@@ -340,14 +343,17 @@ definitions:
         type: number
         format: devise
     example:
-      - id: 3751
-        date: 2023-11-27T09:11:11Z
-        amount: 55.79
-        balance: 755.92
-      - id: 3752
-        date: 2023-11-29T09:21:12Z
-        amount: 101.52
-        balance: 654.40
+      status: 200
+      message: "See the account 's  transactions"
+      transactions:
+        - id: 3751
+          date: 2023-11-27T09:11:11Z
+          amount: 55.79
+          balance: 755.92
+        - id: 3752
+          date: 2023-11-29T09:21:12Z
+          amount: 101.52
+          balance: 654.40
   TransactionCategory:
     type: object
     required:
@@ -356,7 +362,18 @@ definitions:
       category:
         type: string
     example:
-      category: "Holiday"
+      status: 200
+      message: "Updated successful transaction category"
+      transaction:
+        id: 3751
+        date: "2023-11-29T09:19:47Z"
+        description: "Alle delizie di Firenze"
+        amount: 138.56
+        balance: 515.84
+        detail:
+          transactionType: "Restaurant"
+          category: "Holiday"
+          note: "Stay in Florence"          
   TransactionNote:
     type: object
     required:
@@ -365,4 +382,15 @@ definitions:
       note:
         type: string
     example:
-      - note: "Stay in Florence"
+      status: 200
+      message: "Update successful transaction note"
+      transaction:
+        id: 3751
+        date: "2023-11-29T09:19:47Z"
+        description: "Alle delizie di Firenze"
+        amount: 138.56
+        balance: 515.84
+        detail:
+          transactionType: "Restaurant"
+          category: "Holiday"
+          note: "Stay in Florence"
