@@ -8,6 +8,7 @@ host: localhost:3001
 basePath: /api/v1
 schemes:
   - http
+  - https
 paths:
   /user/login:
     post:
@@ -126,7 +127,7 @@ paths:
         "500":
           description: Internal Server Error
 
-  /accounts/{accountId}/{transactionId}:
+  /accounts/{accountId}/transactions/{transactionId}:
     get:
       security:
         - Bearer: []
@@ -154,15 +155,13 @@ paths:
           description: Transaction not found
         "500":
           description: Internal Server Error
-
-  /accounts/{accountId}/{transactionId}/category:
     put:
       security:
         - Bearer: []
       tags:
         - Transaction Module
-      summary: Update transaction category
-      description: API for updating the category in a transaction
+      summary: Update transaction category and note
+      description: API for updating the category and note in a transaction
       parameters:
         - in: path
           name: accountId
@@ -176,51 +175,13 @@ paths:
           type: string
         - in: body
           name: body
-          description: Object containing the new category for the transaction
+          description: Object containing the new category and the new note for the transaction
           required: true
           schema:
-            $ref: "#/definitions/TransactionCategory"
+            $ref: "#/definitions/TransactionCategoryAndNote"
       responses:
         "200":
-          description: Request succeeded. The category has been updated.
-          schema:
-            $ref: "#/definitions/ApiResponse"
-
-        "400":
-          description: Invalid Fields
-        "404":
-          description: Transaction not found
-        "500":
-          description: Internal Server Error
-
-  /accounts/{accountId}/{transactionId}/note:
-    put:
-      security:
-        - Bearer: []
-      tags:
-        - Transaction Module
-      summary: Update transaction note
-      description: API for updating the Note in a transaction
-      parameters:
-        - in: path
-          name: accountId
-          description: Id of the account
-          required: true
-          type: string
-        - in: path
-          name: transactionId
-          description: Id of the transaction
-          required: true
-          type: string
-        - in: body
-          name: body
-          description: Object containing the new note for the transaction
-          required: true
-          schema:
-            $ref: "#/definitions/TransactionNote"
-      responses:
-        "200":
-          description: Request succeeded. The note has been updated.
+          description: Request succeeded. The category and the note has been updated.
           schema:
             $ref: "#/definitions/ApiResponse"
         "400":
@@ -235,6 +196,7 @@ securityDefinitions:
     type: apiKey
     name: Authorization
     in: header
+
 definitions:
   Login:
     type: object
@@ -248,11 +210,13 @@ definitions:
       password:
         type: string
         format: password
+
   LoginResponse:
     type: object
     properties:
       token:
         type: string
+
   User:
     type: object
     required:
@@ -271,6 +235,7 @@ definitions:
         type: string
       phone:
         type: string
+
   UserProfile:
     type: object
     properties:
@@ -280,6 +245,7 @@ definitions:
         type: string
       phone:
         type: string
+
   ApiResponse:
     type: object
     properties:
@@ -287,110 +253,65 @@ definitions:
         type: string
 
   TransactionApiResponse:
-    items:
-      type: object
+    type: object
     properties:
-      id:
-        type: integer
-      date:
-        type: string
-        format: date-time
-      description:
-        type: string
-      amount:
-        type: number
-        format: devise
-      balance:
-        type: number
-        format: devise
-      detail:
-        type: object
-        properties:
-          transactionType:
-            type: string
-          category:
-            type: string
-          note:
-            type: string
-    example:
-      status: 200
-      message: "See one transactions"
-      transaction:
-        id: 3751
-        date: 2023-11-27T09:11:11Z
-        description: ""
-        amount: 55.79
-        balance: 755.92
-        detail:
-          transactionType: "Cake"
-          category: "Food"
-          note: "Mom's birthday"
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            date:
+              type: string
+              format: date-time
+            description:
+              type: string
+            amount:
+              type: number
+              format: float
+            balance:
+              type: number
+              format: float
+            detail:
+              type: object
+              properties:
+                transactionType:
+                  type: string
+                category:
+                  type: string
+                note:
+                  type: string
 
   TransactionsApiResponse:
     type: object
     properties:
-      id:
-        type: integer
-      date:
-        type: string
-        format: date-time
-      description:
-        type: string
-      amount:
-        type: number
-        format: devise
-      balance:
-        type: number
-        format: devise
-    example:
-      status: 200
-      message: "See the account 's  transactions"
       transactions:
-        - id: 3751
-          date: 2023-11-27T09:11:11Z
-          amount: 55.79
-          balance: 755.92
-        - id: 3752
-          date: 2023-11-29T09:21:12Z
-          amount: 101.52
-          balance: 654.40
-  TransactionCategory:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            date:
+              type: string
+              format: date-time
+            description:
+              type: string
+            amount:
+              type: number
+              format: float
+            balance:
+              type: number
+              format: float
+
+  TransactionCategoryAndNote:
     type: object
     required:
       - category
+      - note
     properties:
       category:
         type: string
-    example:
-      status: 200
-      message: "Updated successful transaction category"
-      transaction:
-        id: 3751
-        date: "2023-11-29T09:19:47Z"
-        description: "Alle delizie di Firenze"
-        amount: 138.56
-        balance: 515.84
-        detail:
-          transactionType: "Restaurant"
-          category: "Holiday"
-          note: "Stay in Florence"          
-  TransactionNote:
-    type: object
-    required:
-      - note
-    properties:
       note:
         type: string
-    example:
-      status: 200
-      message: "Update successful transaction note"
-      transaction:
-        id: 3751
-        date: "2023-11-29T09:19:47Z"
-        description: "Alle delizie di Firenze"
-        amount: 138.56
-        balance: 515.84
-        detail:
-          transactionType: "Restaurant"
-          category: "Holiday"
-          note: "Stay in Florence"
